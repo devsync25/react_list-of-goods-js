@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import 'bulma/css/bulma.css';
 import './App.scss';
+import classNames from 'classnames';
 
 export const goodsFromServer = [
   'Dumplings',
@@ -29,16 +30,18 @@ export const App = () => {
   const sortAlphabetically = () => {
     const sorted = [...goodsFromServer].sort((a, b) => a.localeCompare(b));
 
-    setGoods(isReversed ? [...sorted].reverse() : sorted);
-    setActiveSort('alphabetical');
+    if (isReversed) sorted.reverse();
+    setGoods(sorted);
+    setActiveSort('alphabet');
   };
 
   const sortByLength = () => {
     const sorted = [...goodsFromServer].sort(
-      (a, b) => b.length - a.length || a.localeCompare(b),
+      (a, b) => a.length - b.length || a.localeCompare(b),
     );
 
-    setGoods(isReversed ? [...sorted].reverse() : sorted);
+    if (isReversed) sorted.reverse();
+    setGoods(sorted);
     setActiveSort('length');
   };
 
@@ -50,10 +53,8 @@ export const App = () => {
   const getButtonClass = sortType => {
     let colorClass = 'is-warning';
 
-    if (sortType === 'alphabetical') colorClass = 'is-info';
-
+    if (sortType === 'alphabet') colorClass = 'is-info';
     if (sortType === 'length') colorClass = 'is-success';
-
     const lightClass = activeSort === sortType ? '' : 'is-light';
 
     return `button ${colorClass} ${lightClass}`;
@@ -61,13 +62,14 @@ export const App = () => {
 
   return (
     <div className="section content">
+      {' '}
       <div className="buttons">
         <button
           type="button"
-          className={getButtonClass('alphabetical')}
+          className={getButtonClass('alphabet')}
           onClick={sortAlphabetically}
         >
-          Sort alphabetically
+          Sort alphabetically{' '}
         </button>
 
         <button
@@ -77,19 +79,19 @@ export const App = () => {
         >
           Sort by length
         </button>
-
         <button
           type="button"
-          className={`button is-warning ${isReversed ? '' : 'is-light'}`}
+          className={classNames('button is-warning', {
+            'is-light': !isReversed,
+          })}
           onClick={reverseGoods}
         >
           Reverse
         </button>
-
-        {goods.join(',') !== goodsFromServer.join(',') && (
+        {(activeSort !== null || isReversed) && (
           <button
             type="button"
-            className="button is-danger"
+            className="button is-danger is-light"
             onClick={resetGoods}
           >
             Reset
